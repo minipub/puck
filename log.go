@@ -85,18 +85,18 @@ func (l *Logger) SetLevel(level string) {
 }
 
 func getLevel(level string) int {
-	level = strings.ToLower(level)
+	level = strings.ToUpper(level)
 
 	switch level {
-	case "off":
+	case "OFF":
 		return OFF
-	case "debug":
+	case "DEBUG":
 		return DEBUG
-	case "info":
+	case "INFO":
 		return INFO
-	case "warn":
+	case "WARN":
 		return WARN
-	case "error":
+	case "ERROR":
 		return ERROR
 	default:
 		fmt.Printf("Level[ %s ] not found, use [ DEBUG ] as default.\n", level)
