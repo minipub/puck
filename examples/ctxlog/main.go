@@ -4,11 +4,16 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"time"
 
 	"github.com/minipub/puck"
-	uuid "github.com/satori/go.uuid"
+)
+
+var (
+	xtime = 5
+	xcnt  = 3
 )
 
 func main() {
@@ -20,11 +25,6 @@ func main() {
 }
 
 func testHandler(w http.ResponseWriter, r *http.Request) {
-	var (
-		xtime = 5
-		xcnt  = 3
-	)
-
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	defer cancelFunc()
 
@@ -32,18 +32,19 @@ func testHandler(w http.ResponseWriter, r *http.Request) {
 
 	logEntry.SetLevel("info")
 
-	logEntry.Set("traceId", genUUIDv4())
+	logEntry.Set("traceId", fmt.Sprint(randInt(5000)))
 
 	ctx = logEntry.WrapContextLogger(ctx)
 
 	xcnt = xcnt - 1
 	xsleep := xcnt * xtime
 
-	GetLogger(ctx).Infof("before: xcnt[ %d ], xsleep[ %d ]", xcnt, xsleep)
+	puck.GetLogger(ctx).Infof("before: xcnt[ %d ], xsleep[ %d ]", xcnt, xsleep)
 	time.Sleep(time.Duration(xsleep) * time.Second)
-	GetLogger(ctx).Infof("after: xcnt[ %d ], xsleep[ %d ]", xcnt, xsleep)
+	puck.GetLogger(ctx).Infof("after: xcnt[ %d ], xsleep[ %d ]", xcnt, xsleep)
 }
 
-func genUUIDv4() string {
-	return fmt.Sprint(uuid.NewV4())
+func randInt(x int) int {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	return r.Intn(x)
 }
