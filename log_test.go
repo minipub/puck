@@ -14,12 +14,12 @@ func TestNoFieldLog(t *testing.T) {
 
 	logEntry := NewLogger()
 
-	logEntry.SetLevel("info")
+	logEntry.SetLevel("debug")
 	// logEntry.SetLevel("fata") // throw a panic
 
 	ctx = logEntry.WrapContextLogger(ctx)
 
-	GetLogger(ctx).Infof("%s is so cute", "catty")
+	GetLogger(ctx).Debugf("%s is so cute", "catty")
 
 	GetLogger(ctx).Info("doggy is also cute!")
 }
@@ -40,9 +40,9 @@ func TestFieldLog(t *testing.T) {
 
 	ctx = logEntry.WrapContextLogger(ctx)
 
-	GetLogger(ctx).Infof("%s is so sweet", "apple")
+	GetLogger(ctx).Warnf("%s is so sweet", "apple")
 
-	GetLogger(ctx).Info("banana is also sweet!")
+	GetLogger(ctx).Error("banana is also sweet!")
 }
 
 func randInt(x int) int {

@@ -99,32 +99,102 @@ func getLevel(level string) int {
 	case "error":
 		return ERROR
 	default:
-		panic(fmt.Sprintf("No Implemention: no level[ %s ]", level))
+		fmt.Printf("Level[ %s ] not found, use [ DEBUG ] as default.\n", level)
+		return DefaultLevel
 	}
+}
+
+func (l *Logger) outputf(format string, v ...interface{}) {
+	if l.fieldValue != "" {
+		format = fmt.Sprintf("%s: %s", l.fieldValue, format)
+	}
+	l.logger.Output(2, fmt.Sprintf(format, v...))
+}
+
+func (l *Logger) output(v ...interface{}) {
+	if l.fieldValue != "" {
+		v = append([]interface{}{
+			fmt.Sprintf("%s: ", l.fieldValue)}, v...)
+	}
+	l.logger.Output(2, fmt.Sprint(v...))
+}
+
+func (l *Logger) setDebugPrefix() {
+	l.logger.SetPrefix("[ DEBUG ] ")
+}
+
+func (l *Logger) setInfoPrefix() {
+	l.logger.SetPrefix("[ INFO ] ")
+}
+
+func (l *Logger) setWarnPrefix() {
+	l.logger.SetPrefix("[ WARN ] ")
+}
+
+func (l *Logger) setErrorPrefix() {
+	l.logger.SetPrefix("[ ERROR ] ")
+}
+
+func (l *Logger) Debugf(format string, v ...interface{}) {
+	if l == nil || DEBUG < l.level {
+		return
+	}
+	l.setDebugPrefix()
+	l.outputf(format, v...)
+}
+
+func (l *Logger) Debug(v ...interface{}) {
+	if l == nil || DEBUG < l.level {
+		return
+	}
+	l.setDebugPrefix()
+	l.output(v...)
 }
 
 func (l *Logger) Infof(format string, v ...interface{}) {
 	if l == nil || INFO < l.level {
 		return
 	}
-
-	l.logger.SetPrefix("[ INFO ] ")
-	if l.fieldValue != "" {
-		format = fmt.Sprintf("%s: %s", l.fieldValue, format)
-	}
-
-	l.logger.Output(2, fmt.Sprintf(format, v...))
+	l.setInfoPrefix()
+	l.outputf(format, v...)
 }
 
 func (l *Logger) Info(v ...interface{}) {
 	if l == nil || INFO < l.level {
 		return
 	}
+	l.setInfoPrefix()
+	l.output(v...)
+}
 
-	l.logger.SetPrefix("[ INFO ] ")
-	if l.fieldValue != "" {
-		v = append([]interface{}{
-			fmt.Sprintf("%s: ", l.fieldValue)}, v...)
+func (l *Logger) Warnf(format string, v ...interface{}) {
+	if l == nil || WARN < l.level {
+		return
 	}
-	l.logger.Output(2, fmt.Sprint(v...))
+	l.setWarnPrefix()
+	l.outputf(format, v...)
+}
+
+func (l *Logger) Warn(v ...interface{}) {
+	if l == nil || WARN < l.level {
+		return
+	}
+	l.setWarnPrefix()
+	l.output(v...)
+}
+
+func (l *Logger) Errorf(format string, v ...interface{}) {
+	if l == nil || ERROR < l.level {
+		return
+	}
+	l.setErrorPrefix()
+	l.outputf(format, v...)
+}
+
+func (l *Logger) Error(v ...interface{}) {
+	if l == nil || ERROR < l.level {
+		return
+	}
+	l.setErrorPrefix()
+	l.output(v...)
 }
