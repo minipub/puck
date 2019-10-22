@@ -5,8 +5,8 @@ import (
 	"fmt"
 	stdlog "log"
 	"os"
-	"sort"
 	"strings"
+	"sync"
 )
 
 const (
@@ -19,17 +19,17 @@ const (
 	DefaultLevel = DEBUG
 )
 
-type loggerFields map[string]string
+// type loggerFields sync.Map
 
-func (f loggerFields) Set(key, value string) {
-	f[key] = value
-}
+// func (f loggerFields) set(key, value string) {
+// 	f[key] = value
+// }
 
 type Logger struct {
-	level      int
-	logger     *stdlog.Logger
-	fieldValue string
-	loggerFields
+	level        int
+	logger       *stdlog.Logger
+	fieldValue   string
+	loggerFields sync.Map
 }
 
 func GetLogger(ctx context.Context) *Logger {
@@ -44,9 +44,9 @@ func GetLogger(ctx context.Context) *Logger {
 
 func NewLogger() *Logger {
 	return &Logger{
-		level:        DefaultLevel,
-		logger:       stdlog.New(os.Stdout, "", stdlog.Ldate|stdlog.Ltime|stdlog.Lshortfile),
-		loggerFields: make(map[string]string),
+		level:  DefaultLevel,
+		logger: stdlog.New(os.Stdout, "", stdlog.Ldate|stdlog.Ltime|stdlog.Lshortfile),
+		// loggerFields: sync.Map{},
 	}
 }
 
@@ -56,28 +56,48 @@ func (l *Logger) WrapContextLogger(ctx context.Context) context.Context {
 }
 
 func (l *Logger) SetField(key, value string) {
-	l.loggerFields.Set(key, value)
+	l.loggerFields.Store(key, value)
 }
 
 func (l *Logger) buildFieldValue() {
-	if len(l.loggerFields) == 0 {
-		return
-	}
-
-	fieldKeys := make([]string, 0, len(l.loggerFields))
-	for k := range l.loggerFields {
-		fieldKeys = append(fieldKeys, k)
-	}
-
-	sort.Strings(fieldKeys)
-
-	for k, v := range fieldKeys {
-		if k == 0 {
-			l.fieldValue = fmt.Sprintf("%s", l.loggerFields[v])
-		} else {
-			l.fieldValue = fmt.Sprintf("%s: %s", l.loggerFields[v], l.fieldValue)
+	i := 0
+	l.loggerFields.Range(func(k, v interface{}) bool {
+		// fk, ok := k.(string)
+		// if !ok {
+		// 	return true
+		// }
+		fv, ok := v.(string)
+		if !ok {
+			return true
 		}
-	}
+
+		if i == 0 {
+			l.fieldValue = fv
+		} else {
+			l.fieldValue = fmt.Sprintf("%s: %s", l.fieldValue, fv)
+		}
+		i++
+		return true
+	})
+
+	// if len(l.loggerFields) == 0 {
+	// 	return
+	// }
+
+	// fieldKeys := make([]string, 0, len(l.loggerFields))
+	// for k := range l.loggerFields {
+	// 	fieldKeys = append(fieldKeys, k)
+	// }
+
+	// sort.Strings(fieldKeys)
+
+	// for k, v := range fieldKeys {
+	// 	if k == 0 {
+	// 		l.fieldValue = fmt.Sprintf("%s", l.loggerFields[v])
+	// 	} else {
+	// 		l.fieldValue = fmt.Sprintf("%s: %s", l.loggerFields[v], l.fieldValue)
+	// 	}
+	// }
 }
 
 func (l *Logger) SetLevel(level string) {
