@@ -99,7 +99,7 @@ func (l *Logger) outputf(format string, v ...interface{}) {
 	if l.fieldValue != "" {
 		format = fmt.Sprintf("%s: %s", l.fieldValue, format)
 	}
-	l.logger.Output(2, fmt.Sprintf(format, v...))
+	l.logger.Output(3, fmt.Sprintf(format, v...))
 }
 
 func (l *Logger) output(v ...interface{}) {
@@ -107,7 +107,7 @@ func (l *Logger) output(v ...interface{}) {
 		v = append([]interface{}{
 			fmt.Sprintf("%s: ", l.fieldValue)}, v...)
 	}
-	l.logger.Output(2, fmt.Sprint(v...))
+	l.logger.Output(3, fmt.Sprint(v...))
 }
 
 func (l *Logger) setDebugPrefix() {
