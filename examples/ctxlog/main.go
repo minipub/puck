@@ -32,7 +32,7 @@ func testHandler(w http.ResponseWriter, r *http.Request) {
 
 	logEntry.SetLevel("info")
 
-	logEntry.Set("traceId", fmt.Sprint(randInt(5000)))
+	logEntry.SetField("traceId", fmt.Sprint(randInt(5000)))
 
 	ctx = logEntry.WrapContextLogger(ctx)
 
