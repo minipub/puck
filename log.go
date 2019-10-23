@@ -19,12 +19,6 @@ const (
 	DefaultLevel = DEBUG
 )
 
-// type loggerFields sync.Map
-
-// func (f loggerFields) set(key, value string) {
-// 	f[key] = value
-// }
-
 type Logger struct {
 	level        int
 	logger       *stdlog.Logger
@@ -44,9 +38,9 @@ func GetLogger(ctx context.Context) *Logger {
 
 func NewLogger() *Logger {
 	return &Logger{
-		level:  DefaultLevel,
-		logger: stdlog.New(os.Stdout, "", stdlog.Ldate|stdlog.Ltime|stdlog.Lshortfile),
-		// loggerFields: sync.Map{},
+		level:        DefaultLevel,
+		logger:       stdlog.New(os.Stdout, "", stdlog.Ldate|stdlog.Ltime|stdlog.Lshortfile),
+		loggerFields: sync.Map{},
 	}
 }
 
@@ -62,10 +56,6 @@ func (l *Logger) SetField(key, value string) {
 func (l *Logger) buildFieldValue() {
 	i := 0
 	l.loggerFields.Range(func(k, v interface{}) bool {
-		// fk, ok := k.(string)
-		// if !ok {
-		// 	return true
-		// }
 		fv, ok := v.(string)
 		if !ok {
 			return true
@@ -79,25 +69,6 @@ func (l *Logger) buildFieldValue() {
 		i++
 		return true
 	})
-
-	// if len(l.loggerFields) == 0 {
-	// 	return
-	// }
-
-	// fieldKeys := make([]string, 0, len(l.loggerFields))
-	// for k := range l.loggerFields {
-	// 	fieldKeys = append(fieldKeys, k)
-	// }
-
-	// sort.Strings(fieldKeys)
-
-	// for k, v := range fieldKeys {
-	// 	if k == 0 {
-	// 		l.fieldValue = fmt.Sprintf("%s", l.loggerFields[v])
-	// 	} else {
-	// 		l.fieldValue = fmt.Sprintf("%s: %s", l.loggerFields[v], l.fieldValue)
-	// 	}
-	// }
 }
 
 func (l *Logger) SetLevel(level string) {
