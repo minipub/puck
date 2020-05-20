@@ -32,7 +32,7 @@ func TestFieldLog(t *testing.T) {
 
 	logEntry.SetLevel("info")
 
-	// sequence: reversed by key
+	// right now not in sequence, maybe ordered by key later
 	logEntry.SetField("center", "yellow")
 	logEntry.SetField("tail", "red")
 	logEntry.SetField("head", "green")

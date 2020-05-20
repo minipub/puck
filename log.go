@@ -39,7 +39,7 @@ func GetLogger(ctx context.Context) *Logger {
 func NewLogger() *Logger {
 	return &Logger{
 		level:        DefaultLevel,
-		logger:       stdlog.New(os.Stdout, "", stdlog.Ldate|stdlog.Ltime|stdlog.Lshortfile),
+		logger:       stdlog.New(os.Stdout, "", stdlog.Ldate|stdlog.Lmicroseconds|stdlog.Lshortfile),
 		loggerFields: sync.Map{},
 	}
 }
